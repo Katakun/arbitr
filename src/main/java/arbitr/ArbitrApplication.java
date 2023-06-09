@@ -45,17 +45,17 @@ public class ArbitrApplication {
 
 
     @SneakyThrows
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         SpringApplication.run(ArbitrApplication.class, args);
 
         KucoinPublicWSClient kucoinPublicWSClient = new KucoinClientBuilder().withBaseUrl("https://api.kucoin.com")
                 .buildPublicWSClient();
 
         try (
-                Writer writer = new FileWriter("123.csv");
-                CSVPrinter printer = new CSVPrinter(writer, CSV_FORMAT);
+                Writer writer = new FileWriter("share/arbitr.csv");
+                CSVPrinter printer = new CSVPrinter(writer, CSV_FORMAT)
         ) {
-            String ack = kucoinPublicWSClient.onTicker(response -> {
+            String requsetId = kucoinPublicWSClient.onTicker(response -> {
                 for (String key : mapCoins.keySet()) {
                     if (response.getTopic().toUpperCase().contains(key)) {
 
@@ -95,7 +95,6 @@ public class ArbitrApplication {
                 }
 
             }, "KCS-BTC", "DOGE-BTC", "DOGE-KCS");
-            String requsetId = ack;
             while (true) {
                 Thread.sleep(1000);
                 requsetId = kucoinPublicWSClient.ping(requsetId);
