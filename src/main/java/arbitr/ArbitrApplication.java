@@ -39,7 +39,7 @@ public class ArbitrApplication {
             .build();
 
     private enum Headers {
-        DATE, TIMESTAMP, KCS2BTC, DOGEE2BTC, DOGE2KCS, PROFIT_RATIO
+        DATE, TIMESTAMP, KCS2BTC, DOGE2BTC, DOGE2KCS, PROFIT_RATIO
     }
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
@@ -55,7 +55,7 @@ public class ArbitrApplication {
                 Writer writer = new FileWriter("share/arbitr.csv");
                 CSVPrinter printer = new CSVPrinter(writer, CSV_FORMAT)
         ) {
-            String requsetId = kucoinPublicWSClient.onTicker(response -> {
+            String requestId = kucoinPublicWSClient.onTicker(response -> {
                 for (String key : mapCoins.keySet()) {
                     if (response.getTopic().toUpperCase().contains(key)) {
 
@@ -66,15 +66,15 @@ public class ArbitrApplication {
                                 .allMatch(value -> value.get().compareTo(BigDecimal.valueOf(0)) != 0);
 
                         if (!isInitialized) {
-                            log.info("initing");
+                            log.info("initialization");
                             oldValue.set(newValue);
                         } else if (oldValue.get().compareTo(newValue) != 0) {
                             oldValue.set(newValue);
                             BigDecimal dogeBtc = mapCoins.get(DOGE2BTC).get();
                             BigDecimal kcsBtc = mapCoins.get(KCS2BTC).get();
-                            BigDecimal dogeeKcs = mapCoins.get(DOGE2KCS).get();
+                            BigDecimal dogeKcs = mapCoins.get(DOGE2KCS).get();
 
-                            Optional<BigDecimal> percent = Calculator.calculate(dogeBtc, kcsBtc, dogeeKcs);
+                            Optional<BigDecimal> percent = Calculator.calculate(dogeBtc, kcsBtc, dogeKcs);
 
 
                             LocalDateTime dateTime = LocalDateTime.now();
@@ -83,7 +83,7 @@ public class ArbitrApplication {
                                 if (percent.isPresent() && (percent.get().compareTo(BigDecimal.valueOf(0)) < 0)) {
                                     log.info(mapCoins + " profit ratio: " + percent);
                                     printer.printRecord(dateTime.format(FORMATTER), Timestamp.valueOf(dateTime).getNanos(),
-                                            kcsBtc, dogeBtc, dogeeKcs, percent);
+                                            kcsBtc, dogeBtc, dogeKcs, percent);
                                     printer.flush();
                                 }
                             } catch (IOException e) {
@@ -97,7 +97,7 @@ public class ArbitrApplication {
             }, "KCS-BTC", "DOGE-BTC", "DOGE-KCS");
             while (true) {
                 Thread.sleep(1000);
-                requsetId = kucoinPublicWSClient.ping(requsetId);
+                requestId = kucoinPublicWSClient.ping(requestId);
             }
 
         } catch (IOException e) {
