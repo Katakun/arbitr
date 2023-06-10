@@ -15,7 +15,7 @@ public class Calculator {
         log.info("conversionRatio = " + conversionRatio + " dogeBtc: " + dogeBtc + " kcsBtc:" + kcsBtc + " dogeKcs:" + dogeKcs);
         BigDecimal conversionWithFee = getConversionWithFee(conversionRatio);
         BigDecimal percent = conversionWithFee.subtract(BigDecimal.valueOf(1)).multiply(BigDecimal.valueOf(100));
-        return percent.compareTo(BigDecimal.valueOf(1)) > 0 ? Optional.of(percent) : Optional.empty();
+        return percent.compareTo(BigDecimal.valueOf(0)) > 0 ? Optional.of(percent) : Optional.empty();
     }
 
     @NotNull
