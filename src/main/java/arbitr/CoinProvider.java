@@ -32,6 +32,7 @@ public class CoinProvider {
                         .allMatch(value -> value.get().compareTo(BigDecimal.valueOf(0)) != 0);
                 if (!isInitialized) {
                     log.info("initialization");
+                    oldValue.set(newValue);
                     return Optional.empty();
                 }
                 if (oldValue.get().compareTo(newValue) != 0) {
