@@ -7,7 +7,6 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import java.io.FileWriter;
@@ -21,20 +20,17 @@ public class Runner implements CommandLineRunner {
     private static final CSVFormat CSV_FORMAT = CSVFormat.DEFAULT.builder()
             .setHeader(Headers.class)
             .build();
-
-    private final Environment environment;
+    private final CoinProvider coinProvider;
 
     @Override
     public void run(String... args) throws Exception {
-        log.info("Chain = " + environment.getProperty("CHAIN"));
         KucoinPublicWSClient kucoinPublicWSClient = new KucoinClientBuilder().withBaseUrl("https://api.kucoin.com")
                 .buildPublicWSClient();
-
         try (
                 Writer writer = new FileWriter("share/arbitr.csv");
                 CSVPrinter printer = new CSVPrinter(writer, CSV_FORMAT)
         ) {
-            String requestId = kucoinPublicWSClient.onTicker(new OnTickerHandler(printer), "KCS-BTC", "DOGE-BTC", "DOGE-KCS");
+            String requestId = kucoinPublicWSClient.onTicker(new OnTickerHandler(printer, coinProvider), "KCS-BTC", "DOGE-BTC", "DOGE-KCS");
             pauseAndPing(kucoinPublicWSClient, requestId);
 
         } catch (IOException e) {

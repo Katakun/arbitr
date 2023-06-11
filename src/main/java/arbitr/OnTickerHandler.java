@@ -25,10 +25,10 @@ import static arbitr.CoinProvider.*;
 public class OnTickerHandler implements KucoinAPICallback<KucoinEvent<TickerChangeEvent>> {
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private final CSVPrinter printer;
-
+    private final CoinProvider coinProvider;
     @Override
     public void onResponse(KucoinEvent<TickerChangeEvent> response) throws KucoinApiException {
-        Optional<Map<String, AtomicReference<BigDecimal>>> coins = CoinProvider.extract(response);
+        Optional<Map<String, AtomicReference<BigDecimal>>> coins = coinProvider.extract(response);
         if (coins.isPresent()) {
             BigDecimal dogeBtc = coins.get().get(DOGE2BTC).get();
             BigDecimal kcsBtc = coins.get().get(KCS2BTC).get();
