@@ -20,7 +20,7 @@ public class Runner implements CommandLineRunner {
     private static final CSVFormat CSV_FORMAT = CSVFormat.DEFAULT.builder()
             .setHeader(Headers.class)
             .build();
-    private final CoinProvider coinProvider;
+    private final SwapProvider swapProvider;
 
     @Override
     public void run(String... args) throws Exception {
@@ -30,7 +30,7 @@ public class Runner implements CommandLineRunner {
                 Writer writer = new FileWriter("share/arbitr.csv");
                 CSVPrinter printer = new CSVPrinter(writer, CSV_FORMAT)
         ) {
-            String requestId = kucoinPublicWSClient.onTicker(new OnTickerHandler(printer, coinProvider), "KCS-BTC", "DOGE-BTC", "DOGE-KCS");
+            String requestId = kucoinPublicWSClient.onTicker(new OnTickerHandler(printer, swapProvider), "KCS-BTC", "DOGE-BTC", "DOGE-KCS");
             pauseAndPing(kucoinPublicWSClient, requestId);
 
         } catch (IOException e) {

@@ -1,13 +1,21 @@
 package arbitr;
 
-import lombok.Value;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigDecimal;
-@Value
+@Getter
+@Setter
+@RequiredArgsConstructor
 public class Swap {
-    private String leftCoin;
-    private String rightCoin;
+    private final String leftCoin;
+    private final String rightCoin;
     private BigDecimal ratio;
-    private BigDecimal fee;
-    private OrderType orderType;
+    private final BigDecimal fee;
+    private  OrderType orderType;
+
+    public String getCoinPair() {
+        return leftCoin + "-" + rightCoin;
+    }
 }
