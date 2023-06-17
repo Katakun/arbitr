@@ -30,7 +30,15 @@ public class Runner implements CommandLineRunner {
                 Writer writer = new FileWriter("share/arbitr.csv");
                 CSVPrinter printer = new CSVPrinter(writer, CSV_FORMAT)
         ) {
-            String requestId = kucoinPublicWSClient.onTicker(new OnTickerHandler(printer, swapProvider), "KCS-BTC", "DOGE-BTC", "DOGE-KCS");
+            String requestId = kucoinPublicWSClient.onTicker(
+                    new OnTickerCallback(
+                            printer,
+                            swapProvider
+                    ),
+                    "KCS-BTC",
+                    "DOGE-BTC",
+                    "DOGE-KCS"
+            );
             pauseAndPing(kucoinPublicWSClient, requestId);
 
         } catch (IOException e) {

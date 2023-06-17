@@ -18,22 +18,21 @@ import java.util.Optional;
 
 @Log4j2
 @RequiredArgsConstructor
-public class OnTickerHandler implements KucoinAPICallback<KucoinEvent<TickerChangeEvent>> {
+public class OnTickerCallback implements KucoinAPICallback<KucoinEvent<TickerChangeEvent>> {
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private final CSVPrinter printer;
     private final SwapProvider swapProvider;
 
     @Override
     public void onResponse(KucoinEvent<TickerChangeEvent> response) throws KucoinApiException {
-        Optional<Swap[]> coins = swapProvider.extract(response);
+        Optional<Swap[]> optionalSwaps = swapProvider.extract(response);
 
-        coins.ifPresent(swaps -> {
+        optionalSwaps.ifPresent(swaps -> {
             BigDecimal ratio0 = swaps[0].getRatio();
             BigDecimal ratio1 = swaps[1].getRatio();
             BigDecimal ratio2 = swaps[2].getRatio();
             Optional<BigDecimal> percentOptional = Calculator.calculate(ratio0, ratio1, ratio2);
             LocalDateTime dateTime = LocalDateTime.now();
-
             percentOptional.ifPresent(percent -> save(printer, ratio0, ratio1, ratio2, percent, dateTime));
         });
     }

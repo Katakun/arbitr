@@ -37,15 +37,15 @@ public class SwapProvider {
 
     public Optional<Swap[]> extract(KucoinEvent<TickerChangeEvent> response) {
         String topic = response.getTopic();
-        updateRatio(response, topic);
-        if (notInitializedSwapCount == 0) {
+        boolean updated = updateRatio(response, topic.split(":")[1]);
+        if (notInitializedSwapCount == 0 && updated) {
             return Optional.of(swaps);
         } else {
             return Optional.empty();
         }
     }
 
-    private void updateRatio(KucoinEvent<TickerChangeEvent> response, String topic) {
+    private boolean updateRatio(KucoinEvent<TickerChangeEvent> response, String topic) {
         for (Swap swap : swaps) {
             if (topic.toUpperCase().equals(swap.getCoinPair())) {
                 TickerChangeEvent data = response.getData();
@@ -55,10 +55,16 @@ public class SwapProvider {
                     swap.setRatio(newValue);
                     notInitializedSwapCount--;
                     log.info("initialization");
+                    return false;
                 } else if (!oldValue.equals(newValue)) {
                     swap.setRatio(newValue);
+                    return true;
+                } else {
+                    return false;
                 }
             }
         }
+        throw new IllegalStateException();
     }
+
 }

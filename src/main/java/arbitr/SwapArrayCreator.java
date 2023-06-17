@@ -3,14 +3,16 @@ package arbitr;
 import com.kucoin.sdk.KucoinClientBuilder;
 import com.kucoin.sdk.KucoinRestClient;
 import com.kucoin.sdk.rest.response.MarketTickerResponse;
+import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+@Log4j2
 public class SwapArrayCreator {
     private final static BigDecimal FEE = new BigDecimal("0.001");
 
@@ -33,9 +35,14 @@ public class SwapArrayCreator {
             if (coinPairsFilteredlist.size() != 3) {
                 throw new IllegalStateException("Coin pair != 3");
             }
-            for (String coinPairString : coinPairsFilteredlist) {
-                for (Swap swap : swaps) {
-                    getOrderType(coinPairString, pairMap).ifPresent(swap::setOrderType);
+            for (Swap swap : swaps) {
+                for (String coinPairString : coinPairsFilteredlist) {
+                    if (coinPairString.contains(swap.getFromCoin()) && coinPairString.contains(swap.getToCoin())) {
+                        getOrderType(coinPairString, pairMap).ifPresent(orderType -> {
+                            log.info("from Coin: " + swap.getFromCoin() + " toCoin: " + swap.getToCoin() + " orderType: " + orderType);
+                            swap.setOrderType(orderType);
+                        });
+                    }
                 }
             }
         } catch (IOException e) {
@@ -57,10 +64,10 @@ public class SwapArrayCreator {
     }
 
     private Map<String, String> toPairMap(Swap[] swaps) {
-        Map<String, String> pairMap = new HashMap<>();
+        Map<String, String> pairMap = new LinkedHashMap<>();
         for (Swap swap : swaps) {
-            String forwardPair = swap.getLeftCoin() + "-" + swap.getRightCoin();
-            String backwardPair = swap.getRightCoin() + "-" + swap.getLeftCoin();
+            String forwardPair = swap.getFromCoin() + "-" + swap.getToCoin();
+            String backwardPair = swap.getToCoin() + "-" + swap.getFromCoin();
             pairMap.put(forwardPair, backwardPair);
         }
         return pairMap;
