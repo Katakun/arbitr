@@ -9,6 +9,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
@@ -17,16 +18,11 @@ import java.util.concurrent.atomic.AtomicReference;
 @RequiredArgsConstructor
 @Component
 public class CoinProvider {
-    public final static String KCS2BTC = "KCS-BTC";
-    public final static String DOGE2BTC = "DOGE-BTC";
-    public final static String DOGE2KCS = "DOGE-KCS";
     private String[] coinsInChain;
     private final Environment environment;
-
-    private final static Map<String, AtomicReference<BigDecimal>> coins = Map.of(
-            KCS2BTC, new AtomicReference<>(new BigDecimal(0)),
-            DOGE2BTC, new AtomicReference<>(new BigDecimal(0)),
-            DOGE2KCS, new AtomicReference<>(new BigDecimal(0)));
+    private Swap[] swaps = new Swap[3];
+    private final static int ROUNDING_MODE = 10;
+    private final static BigDecimal FEE = new BigDecimal("0.001");
 
     @PostConstruct
     public void init() {
@@ -38,12 +34,29 @@ public class CoinProvider {
         coinsInChain = chainString.split("->");
     }
 
+    public Optional<List<Swap>> extractNew(KucoinEvent<TickerChangeEvent> response) {
+        String topic = response.getTopic();
+        for (int i = 0; i < coinsInChain.length; i++) {
+            if (topic.toUpperCase().contains(coinsInChain[i])) {
+                BigDecimal newValue = response.getData().getBestBid();
+                if (swaps[i] == null) {
+                    String[] split = topic.split("-");
+                    String leftCoin = split[0];
+                    String rightCoin = split[1];
+                    BigDecimal ratio = BigDecimal.ONE.divide(newValue, ROUNDING_MODE);
+
+                    swaps[i] = new Swap(leftCoin, rightCoin, ratio, );
+                }
+
+            }
+        }
+    }
 
 
-    public Optional<Map<String, AtomicReference<BigDecimal>>> extract(KucoinEvent<TickerChangeEvent> response) {
+    public Optional<List<Swap>> extract(KucoinEvent<TickerChangeEvent> response) {
         log.info(coinsInChain);
         String topic = response.getTopic();
-        for (String key : coins.keySet()) {
+        for (String key : coinsInChain) {
             if (topic.toUpperCase().contains(key)) {
                 // TODO change getBestBid()
                 BigDecimal newValue = response.getData().getBestBid();
