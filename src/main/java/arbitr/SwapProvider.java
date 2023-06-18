@@ -9,6 +9,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -19,9 +20,9 @@ import static java.util.stream.Collectors.toList;
 @RequiredArgsConstructor
 @Component
 public class SwapProvider {
+    private final static int ROUNDING_SCALE = 10;
     private final Environment environment;
     private Swap[] swaps;
-    private final static int ROUNDING_MODE = 10;
     private int notInitializedSwapCount = 3;
 
     @PostConstruct
@@ -49,7 +50,7 @@ public class SwapProvider {
         for (Swap swap : swaps) {
             if (topic.toUpperCase().equals(swap.getCoinPair())) {
                 TickerChangeEvent data = response.getData();
-                BigDecimal newValue = swap.getOrderType() == OrderType.BID ? data.getBestBid() : data.getBestAsk();
+                BigDecimal newValue = swap.getOrderType() == OrderType.BID ? BigDecimal.ONE.divide(data.getBestBid(), ROUNDING_SCALE, RoundingMode.HALF_UP) : data.getBestAsk();
                 BigDecimal oldValue = swap.getRatio();
                 if (oldValue == null) {
                     swap.setRatio(newValue);

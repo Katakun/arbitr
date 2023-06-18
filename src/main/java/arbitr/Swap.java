@@ -1,17 +1,33 @@
 package arbitr;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
 @Getter
-@RequiredArgsConstructor
 public class Swap {
     private final String fromCoin;
     private final String toCoin;
+
+    // Это не котировка, это переводной коэффициент
+    // для OrderType.ASK ratio = 1/котировку
+    // для OrderType.BID ratio = котировка
     private BigDecimal ratio;
+
     private final BigDecimal fee;
     private  OrderType orderType;
+
+    public Swap(String fromCoin, String toCoin, BigDecimal fee) {
+        this.fromCoin = fromCoin;
+        this.toCoin = toCoin;
+        this.fee = fee;
+    }
+
+    public Swap(String fromCoin, String toCoin, BigDecimal fee, BigDecimal ratio) {
+        this.fromCoin = fromCoin;
+        this.toCoin = toCoin;
+        this.ratio = ratio;
+        this.fee = fee;
+    }
 
     public String getCoinPair() {
         switch (orderType) {

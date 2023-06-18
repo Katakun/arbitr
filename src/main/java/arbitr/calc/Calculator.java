@@ -1,18 +1,18 @@
 package arbitr.calc;
 
+import arbitr.Swap;
 import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Optional;
 
 @Log4j2
 public class Calculator {
 
-    public static Optional<BigDecimal> calculate(BigDecimal dogeBtc, BigDecimal kcsBtc, BigDecimal dogeKcs) {
-        BigDecimal conversionRatio = getConversionRatio(dogeBtc, kcsBtc, dogeKcs);
-        log.info("conversionRatio = " + conversionRatio + " dogeBtc: " + dogeBtc + " kcsBtc:" + kcsBtc + " dogeKcs:" + dogeKcs);
+    public static Optional<BigDecimal> calculate(Swap[] swaps) {
+        BigDecimal conversionRatio = getConversionRatio(swaps);
+        log.info("conversionRatio = " + conversionRatio);
         BigDecimal conversionWithFee = getConversionWithFee(conversionRatio);
         BigDecimal percent = conversionWithFee.subtract(BigDecimal.valueOf(1)).multiply(BigDecimal.valueOf(100));
         return percent.compareTo(BigDecimal.valueOf(0)) > 0 ? Optional.of(percent) : Optional.empty();
@@ -24,7 +24,11 @@ public class Calculator {
     }
 
     @NotNull
-    static BigDecimal getConversionRatio(BigDecimal dogeBtc, BigDecimal kcsBtc, BigDecimal dogeKcs) {
-        return dogeBtc.divide(kcsBtc, 10, RoundingMode.HALF_UP).divide(dogeKcs, 10, RoundingMode.HALF_UP);
+    static BigDecimal getConversionRatio(Swap[] swaps) {
+        BigDecimal result = BigDecimal.ONE;
+        for (Swap swap : swaps) {
+            result = result.multiply(swap.getRatio());
+        }
+        return result;
     }
 }

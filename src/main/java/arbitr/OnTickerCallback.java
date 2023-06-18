@@ -14,7 +14,10 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Log4j2
 @RequiredArgsConstructor
@@ -28,21 +31,22 @@ public class OnTickerCallback implements KucoinAPICallback<KucoinEvent<TickerCha
         Optional<Swap[]> optionalSwaps = swapProvider.extract(response);
 
         optionalSwaps.ifPresent(swaps -> {
-            BigDecimal ratio0 = swaps[0].getRatio();
-            BigDecimal ratio1 = swaps[1].getRatio();
-            BigDecimal ratio2 = swaps[2].getRatio();
-            Optional<BigDecimal> percentOptional = Calculator.calculate(ratio0, ratio1, ratio2);
+            Optional<BigDecimal> percentOptional = Calculator.calculate(swaps);
             LocalDateTime dateTime = LocalDateTime.now();
-            percentOptional.ifPresent(percent -> save(printer, ratio0, ratio1, ratio2, percent, dateTime));
+            percentOptional.ifPresent(percent -> {
+                List<BigDecimal> ratios = Arrays.stream(swaps).map(swap -> swap.getRatio()).collect(Collectors.toList());
+                save(printer, ratios, percent, dateTime);
+            });
         });
     }
 
     private void save(
-            CSVPrinter printer, BigDecimal dogeBtc, BigDecimal kcsBtc, BigDecimal dogeKcs,
+            CSVPrinter printer, List<BigDecimal> ratios,
             BigDecimal percent, LocalDateTime dateTime
     ) {
         try {
-            printer.printRecord(dateTime.format(FORMATTER), Timestamp.valueOf(dateTime).getNanos(), kcsBtc, dogeBtc, dogeKcs, percent);
+            printer.printRecord(dateTime.format(FORMATTER), Timestamp.valueOf(dateTime).getNanos(),
+                    ratios.get(0), ratios.get(1), ratios.get(2), percent);
             printer.flush();
         } catch (IOException e) {
             throw new RuntimeException(e);

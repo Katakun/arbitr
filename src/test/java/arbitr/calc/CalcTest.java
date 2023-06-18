@@ -1,34 +1,40 @@
 package arbitr.calc;
 
+import arbitr.Swap;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 public class CalcTest {
+    DecimalFormat decimalFormat = new DecimalFormat("#.0000000000");
 
     @Test
     public void calculatePositiveTest() {
-        BigDecimal dogeBtc = BigDecimal.valueOf(2);
-        BigDecimal kcsBtc = BigDecimal.valueOf(9);
-        BigDecimal dogeKcs = BigDecimal.valueOf(3);
+        Swap[] swaps = {
+                new Swap("a", "b", new BigDecimal("0.001"), BigDecimal.valueOf(2)),
+                new Swap("b", "c", new BigDecimal("0.001"), new BigDecimal("1").divide(new BigDecimal(9), 15, RoundingMode.CEILING)),
+                new Swap("c", "a", new BigDecimal("0.001"), new BigDecimal("1").divide(new BigDecimal(3), 15, RoundingMode.CEILING))};
 
-        Optional<BigDecimal> result = Calculator.calculate(dogeBtc, kcsBtc, dogeKcs);
+        Optional<BigDecimal> result = Calculator.calculate(swaps);
 
         assertEquals(Optional.empty(), result);
     }
 
     @Test
     public void calculateRatioTest() {
-        BigDecimal dogeBtc = BigDecimal.valueOf(0.000002551);
-        BigDecimal kcsBtc = BigDecimal.valueOf(0.0002638);
-        BigDecimal dogeKcs = BigDecimal.valueOf(0.009656);
-        BigDecimal result = Calculator.getConversionRatio(dogeBtc, kcsBtc, dogeKcs);
+        Swap[] swaps = {
+                new Swap("a", "b", new BigDecimal("0.001"), BigDecimal.valueOf(0.000002551)),
+                new Swap("b", "c", new BigDecimal("0.001"), BigDecimal.valueOf(1).divide(BigDecimal.valueOf(0.0002638), 10, RoundingMode.HALF_UP)),
+                new Swap("c", "a", new BigDecimal("0.001"), BigDecimal.valueOf(1).divide(BigDecimal.valueOf(0.009656), 10, RoundingMode.HALF_UP))};
 
-        assertEquals(new BigDecimal("1.0014710750"), result);
+        BigDecimal result = Calculator.getConversionRatio(swaps);
+        assertEquals("1.0014710750", decimalFormat.format(result));
     }
 
     @Test
@@ -40,33 +46,39 @@ public class CalcTest {
 
     @Test
     public void calculateNegativeTest() {
-        BigDecimal dogeBtc = BigDecimal.valueOf(1.0);
-        BigDecimal kcsBtc = BigDecimal.valueOf(1.0);
-        BigDecimal dogeKcs = BigDecimal.valueOf(1.0);
-        BigDecimal conversionRatio = Calculator.getConversionRatio(dogeBtc, kcsBtc, dogeKcs);
-        BigDecimal conversionWithFee = Calculator.getConversionWithFee(conversionRatio);
-        Optional<BigDecimal> result = Calculator.calculate(dogeBtc, kcsBtc, dogeKcs);
+        Swap[] swaps = {
+                new Swap("a", "b", BigDecimal.valueOf(0.001), BigDecimal.ONE),
+                new Swap("b", "c", BigDecimal.valueOf(0.001), BigDecimal.ONE),
+                new Swap("c", "a", BigDecimal.valueOf(0.001), BigDecimal.ONE)};
 
-        assertEquals(new BigDecimal("0.9970000000"), conversionWithFee);
+        BigDecimal conversionRatio = Calculator.getConversionRatio(swaps);
+        BigDecimal conversionWithFee = Calculator.getConversionWithFee(conversionRatio);
+        Optional<BigDecimal> result = Calculator.calculate(swaps);
+
+        assertEquals(new BigDecimal("0.997"), conversionWithFee);
         assertEquals(Optional.empty(), result);
     }
 
     @Test
     public void calculateTest() {
-        BigDecimal dogeBtc = BigDecimal.valueOf(9.0);
-        BigDecimal kcsBtc = BigDecimal.valueOf(2.0);
-        BigDecimal dogeKcs = BigDecimal.valueOf(3.0);
-        Optional<BigDecimal> result = Calculator.calculate(dogeBtc, kcsBtc, dogeKcs);
+        Swap[] swaps = {
+                new Swap("a", "b", new BigDecimal("0.001"), new BigDecimal(9)),
+                new Swap("b", "c", new BigDecimal("0.001"), new BigDecimal("1").divide(new BigDecimal(2), 15, RoundingMode.CEILING)),
+                new Swap("c", "a", new BigDecimal("0.001"), new BigDecimal("1").divide(new BigDecimal(3), 15, RoundingMode.CEILING))};
 
-        assertEquals(new BigDecimal("49.7000000000"), result.orElseThrow());
+        Optional<BigDecimal> result = Calculator.calculate(swaps);
+
+        assertEquals("49.7000000000", decimalFormat.format(result.orElseThrow()));
     }
 
     @Test
     public void getConversionRatioPositiveTest() {
-        BigDecimal dogeBtc = BigDecimal.valueOf(9.0);
-        BigDecimal kcsBtc = BigDecimal.valueOf(2.0);
-        BigDecimal dogeKcs = BigDecimal.valueOf(3.0);
-        BigDecimal result = Calculator.getConversionRatio(dogeBtc, kcsBtc, dogeKcs);
+        Swap[] swaps = {
+                new Swap("a", "b", new BigDecimal("0.001"), new BigDecimal(9)),
+                new Swap("b", "c", new BigDecimal("0.001"), new BigDecimal("1").divide(new BigDecimal(2), 10, RoundingMode.HALF_UP)),
+                new Swap("c", "a", new BigDecimal("0.001"), new BigDecimal("1").divide(new BigDecimal(3), 10,RoundingMode.HALF_UP))};
+
+        BigDecimal result = Calculator.getConversionRatio(swaps);
 
         assertEquals(new BigDecimal("1.5000000000"), result);
     }
