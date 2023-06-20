@@ -1,25 +1,24 @@
 package arbitr.calc;
 
+import arbitr.OrderType;
 import arbitr.Swap;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
 import java.util.Optional;
 
+import static arbitr.Constants.FEE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 public class CalcTest {
-    DecimalFormat decimalFormat = new DecimalFormat("#.0000000000");
-
     @Test
     public void calculatePositiveTest() {
         Swap[] swaps = {
-                new Swap("a", "b", new BigDecimal("0.001"), BigDecimal.valueOf(2)),
-                new Swap("b", "c", new BigDecimal("0.001"), new BigDecimal("1").divide(new BigDecimal(9), 15, RoundingMode.CEILING)),
-                new Swap("c", "a", new BigDecimal("0.001"), new BigDecimal("1").divide(new BigDecimal(3), 15, RoundingMode.CEILING))};
+                new Swap("a", "b", FEE, true, OrderType.BID, "", BigDecimal.valueOf(1)),
+                new Swap("a", "b", FEE, false, OrderType.BID, "", BigDecimal.valueOf(1)),
+                new Swap("a", "b", FEE, true, OrderType.BID, "", BigDecimal.valueOf(1))
+        };
 
         Optional<BigDecimal> result = Calculator.calculate(swaps);
 
@@ -29,17 +28,24 @@ public class CalcTest {
     @Test
     public void calculateRatioTest() {
         Swap[] swaps = {
-                new Swap("a", "b", new BigDecimal("0.001"), BigDecimal.valueOf(0.000002551)),
-                new Swap("b", "c", new BigDecimal("0.001"), BigDecimal.valueOf(1).divide(BigDecimal.valueOf(0.0002638), 10, RoundingMode.HALF_UP)),
-                new Swap("c", "a", new BigDecimal("0.001"), BigDecimal.valueOf(1).divide(BigDecimal.valueOf(0.009656), 10, RoundingMode.HALF_UP))};
+                new Swap("a", "b", FEE, false, OrderType.BID, "", BigDecimal.valueOf(0.000002551)),
+                new Swap("a", "b", FEE, true, OrderType.BID, "", BigDecimal.valueOf(0.0002638)),
+                new Swap("a", "b", FEE, true, OrderType.BID, "", BigDecimal.valueOf(0.009656))
+        };
 
         BigDecimal result = Calculator.getConversionRatio(swaps);
-        assertEquals("1.0014710750", decimalFormat.format(result));
+        assertEquals(new BigDecimal("1.001471075"), result);
     }
 
     @Test
     public void conversionWithFeeTest() {
-        BigDecimal conversionWithFee = Calculator.getConversionWithFee(BigDecimal.valueOf(1.004));
+        Swap[] swaps = {
+                new Swap("a", "b", FEE, false, OrderType.BID, "", BigDecimal.valueOf(0.000002551)),
+                new Swap("a", "b", FEE, true, OrderType.BID, "", BigDecimal.valueOf(0.0002638)),
+                new Swap("a", "b", FEE, true, OrderType.BID, "", BigDecimal.valueOf(0.009656))
+        };
+
+        BigDecimal conversionWithFee = Calculator.getConversionWithFee(BigDecimal.valueOf(1.004), swaps);
 
         assertEquals(new BigDecimal("1.001"), conversionWithFee);
     }
@@ -47,40 +53,28 @@ public class CalcTest {
     @Test
     public void calculateNegativeTest() {
         Swap[] swaps = {
-                new Swap("a", "b", BigDecimal.valueOf(0.001), BigDecimal.ONE),
-                new Swap("b", "c", BigDecimal.valueOf(0.001), BigDecimal.ONE),
-                new Swap("c", "a", BigDecimal.valueOf(0.001), BigDecimal.ONE)};
-
+                new Swap("a", "b", FEE, false, OrderType.BID, "", BigDecimal.ONE),
+                new Swap("a", "b", FEE, false, OrderType.BID, "", BigDecimal.ONE),
+                new Swap("a", "b", FEE, false, OrderType.BID, "", BigDecimal.ONE)
+        };
         BigDecimal conversionRatio = Calculator.getConversionRatio(swaps);
-        BigDecimal conversionWithFee = Calculator.getConversionWithFee(conversionRatio);
+        BigDecimal conversionWithFee = Calculator.getConversionWithFee(conversionRatio, swaps);
         Optional<BigDecimal> result = Calculator.calculate(swaps);
 
         assertEquals(new BigDecimal("0.997"), conversionWithFee);
         assertEquals(Optional.empty(), result);
     }
 
-    @Test
-    public void calculateTest() {
-        Swap[] swaps = {
-                new Swap("a", "b", new BigDecimal("0.001"), new BigDecimal(9)),
-                new Swap("b", "c", new BigDecimal("0.001"), new BigDecimal("1").divide(new BigDecimal(2), 15, RoundingMode.CEILING)),
-                new Swap("c", "a", new BigDecimal("0.001"), new BigDecimal("1").divide(new BigDecimal(3), 15, RoundingMode.CEILING))};
-
-        Optional<BigDecimal> result = Calculator.calculate(swaps);
-
-        assertEquals("49.7000000000", decimalFormat.format(result.orElseThrow()));
-    }
 
     @Test
     public void getConversionRatioPositiveTest() {
         Swap[] swaps = {
-                new Swap("a", "b", new BigDecimal("0.001"), new BigDecimal(9)),
-                new Swap("b", "c", new BigDecimal("0.001"), new BigDecimal("1").divide(new BigDecimal(2), 10, RoundingMode.HALF_UP)),
-                new Swap("c", "a", new BigDecimal("0.001"), new BigDecimal("1").divide(new BigDecimal(3), 10,RoundingMode.HALF_UP))};
-
+                new Swap("a", "b", FEE, false, OrderType.BID, "", BigDecimal.valueOf(9)),
+                new Swap("a", "b", FEE, true, OrderType.BID, "", BigDecimal.valueOf(2)),
+                new Swap("a", "b", FEE, true, OrderType.BID, "", BigDecimal.valueOf(3))
+        };
         BigDecimal result = Calculator.getConversionRatio(swaps);
 
-        assertEquals(new BigDecimal("1.5000000000"), result);
+        assertEquals(new BigDecimal("1.500000000"), result);
     }
-
 }

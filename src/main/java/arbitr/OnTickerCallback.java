@@ -34,7 +34,7 @@ public class OnTickerCallback implements KucoinAPICallback<KucoinEvent<TickerCha
             Optional<BigDecimal> percentOptional = Calculator.calculate(swaps);
             LocalDateTime dateTime = LocalDateTime.now();
             percentOptional.ifPresent(percent -> {
-                List<BigDecimal> ratios = Arrays.stream(swaps).map(swap -> swap.getRatio()).collect(Collectors.toList());
+                List<BigDecimal> ratios = Arrays.stream(swaps).map(Swap::getPrice).collect(Collectors.toList());
                 save(printer, ratios, percent, dateTime);
             });
         });

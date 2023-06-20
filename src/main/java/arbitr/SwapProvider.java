@@ -9,63 +9,71 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import static arbitr.Constants.CHAIN_LENGTH;
 import static java.util.stream.Collectors.toList;
 
 @Log4j2
 @RequiredArgsConstructor
 @Component
 public class SwapProvider {
-    private final static int ROUNDING_SCALE = 10;
     private final Environment environment;
     private Swap[] swaps;
-    private int notInitializedSwapCount = 3;
+    private int notInitializedSwapCount = CHAIN_LENGTH;
 
     @PostConstruct
     public void init() {
+        // CHAIN=XCN->BTC->USDC
         String chainString = environment.getProperty("CHAIN");
         log.info("Chain = " + chainString);
         if (null == chainString || chainString.isEmpty()) {
             throw new IllegalArgumentException("Chain is empty");
         }
-        List<String> coinsInChain = Arrays.stream(chainString.split("->")).map(coinString -> coinString.toUpperCase()).collect(toList());
+        // "XCN", "BTC", "USDC"
+        List<String> coinsInChain = Arrays.stream(chainString.split("->"))
+                .map(String::toUpperCase).collect(toList());
         swaps = new SwapArrayCreator().create(coinsInChain);
     }
 
     public Optional<Swap[]> extract(KucoinEvent<TickerChangeEvent> response) {
-        String topic = response.getTopic();
-        boolean updated = updateRatio(response, topic.split(":")[1]);
-        if (notInitializedSwapCount == 0 && updated) {
+        if (updatePrice(response).isPresent()) {
             return Optional.of(swaps);
-        } else {
-            return Optional.empty();
         }
+        return Optional.empty();
     }
 
-    private boolean updateRatio(KucoinEvent<TickerChangeEvent> response, String topic) {
+    private Optional<Swap[]> updatePrice(KucoinEvent<TickerChangeEvent> response) {
+        // topic = /market/ticker:KCS-BTC
+        String topic = response.getTopic().split(":")[1];
         for (Swap swap : swaps) {
-            if (topic.toUpperCase().equals(swap.getCoinPair())) {
-                TickerChangeEvent data = response.getData();
-                BigDecimal newValue = swap.getOrderType() == OrderType.BID ? BigDecimal.ONE.divide(data.getBestBid(), ROUNDING_SCALE, RoundingMode.HALF_UP) : data.getBestAsk();
-                BigDecimal oldValue = swap.getRatio();
-                if (oldValue == null) {
-                    swap.setRatio(newValue);
+            if (swap.getTicker().equals(topic)) {
+                BigDecimal oldPrice = swap.getPrice();
+                BigDecimal newPrice = swap.getOrderType() == OrderType.ASK
+                        ? response.getData().getBestAsk()
+                        : response.getData().getBestBid();
+                if (oldPrice == null) {
+                    swap.setPrice(newPrice);
+                    log.info("initializing " + notInitializedSwapCount);
                     notInitializedSwapCount--;
-                    log.info("initialization");
-                    return false;
-                } else if (!oldValue.equals(newValue)) {
-                    swap.setRatio(newValue);
-                    return true;
+                    if (notInitializedSwapCount > 0) {
+                        return Optional.empty();
+                    }
+                    return Optional.of(swaps);
+                } else if (oldPrice.compareTo(newPrice) != 0) {
+                    swap.setPrice(newPrice);
+                    if (notInitializedSwapCount > 0) {
+                        return Optional.empty();
+                    } else {
+                        return Optional.of(swaps);
+                    }
                 } else {
-                    return false;
+                    return Optional.empty();
                 }
             }
         }
-        throw new IllegalStateException();
+        throw new IllegalStateException("Not found ticker in swaps: " + topic);
     }
-
 }

@@ -6,43 +6,43 @@ import com.kucoin.sdk.rest.response.MarketTickerResponse;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+
+import static arbitr.Constants.CHAIN_LENGTH;
+import static arbitr.Constants.FEE;
 
 @Log4j2
 public class SwapArrayCreator {
-    private final static BigDecimal FEE = new BigDecimal("0.001");
 
     public Swap[] create(List<String> coinList) {
-        Swap[] swaps = new Swap[3];
-        swaps[0] = new Swap(coinList.get(0), coinList.get(1), FEE);
-        swaps[1] = new Swap(coinList.get(1), coinList.get(2), FEE);
-        swaps[2] = new Swap(coinList.get(2), coinList.get(0), FEE);
-
-
-        Map<String, String> pairMap = toPairMap(swaps);
+        Swap[] swaps = new Swap[CHAIN_LENGTH];
+        // <"XCN-BTC",  "BTC-XCN">
+        // <"BTC-USDC", "USDC-BTC">
+        // <"USDC-XCN", "XCN-USDC">
+        Map<String, String> pairMap = toPairMap(coinList);
         KucoinClientBuilder builder = new KucoinClientBuilder().withBaseUrl("https://api.kucoin.com");
         KucoinRestClient kucoinRestClient = builder.buildRestClient();
         try {
             List<MarketTickerResponse> tickers = kucoinRestClient.symbolAPI().getAllTickers().getTicker();
+            // TODO Take saved result from parser (class State)
             List<String> coinPairsFilteredlist = tickers.stream()
                     .map(coinPairString -> coinPairString.getSymbol().toUpperCase())
-                    .filter(coinPairString -> getOrderType(coinPairString, pairMap).isPresent())
+                    .filter(coinPairString -> pairMap.containsKey(coinPairString) || pairMap.containsValue(coinPairString))
                     .toList();
-            if (coinPairsFilteredlist.size() != 3) {
-                throw new IllegalStateException("Coin pair != 3");
+            if (coinPairsFilteredlist.size() != CHAIN_LENGTH) {
+                throw new IllegalStateException("The quantity of coin pair != " + CHAIN_LENGTH);
             }
-            for (Swap swap : swaps) {
-                for (String coinPairString : coinPairsFilteredlist) {
-                    if (coinPairString.contains(swap.getFromCoin()) && coinPairString.contains(swap.getToCoin())) {
-                        getOrderType(coinPairString, pairMap).ifPresent(orderType -> {
-                            log.info("from Coin: " + swap.getFromCoin() + " toCoin: " + swap.getToCoin() + " orderType: " + orderType);
-                            swap.setOrderType(orderType);
-                        });
-                    }
+            int swapNumber = 0;
+            for (Map.Entry<String, String> entry : pairMap.entrySet()) {
+                String[] coins = entry.getKey().split("-");
+                if (coinPairsFilteredlist.contains(entry.getKey())) {
+                    swaps[swapNumber++] = new Swap(coins[0], coins[1], FEE, false, OrderType.BID, entry.getKey());
+                } else if (coinPairsFilteredlist.contains(entry.getValue())) {
+                    swaps[swapNumber++] = new Swap(coins[0], coins[1], FEE, true, OrderType.ASK, entry.getValue());
+                } else {
+                    throw new IllegalStateException(entry + " pair not in keys and not in values");
                 }
             }
         } catch (IOException e) {
@@ -51,25 +51,19 @@ public class SwapArrayCreator {
         return swaps;
     }
 
-    private Optional<OrderType> getOrderType(String coinPair, Map<String, String> pairMap) {
-        for (Map.Entry<String, String> entry : pairMap.entrySet()) {
-            if (coinPair.equals(entry.getKey())) {
-                return Optional.of(OrderType.BID);
-            }
-            if (coinPair.equals(entry.getValue())) {
-                return Optional.of(OrderType.ASK);
-            }
-        }
-        return Optional.empty();
-    }
-
-    private Map<String, String> toPairMap(Swap[] swaps) {
+    // "XCN", "BTC", "USDC" -> <"XCN-BTC",  "BTC-XCN">
+    //                         <"BTC-USDC", "USDC-BTC">
+    //                         <"USDC-XCN", "XCN-USDC">
+    private Map<String, String> toPairMap(List<String> coinList) {
         Map<String, String> pairMap = new LinkedHashMap<>();
-        for (Swap swap : swaps) {
-            String forwardPair = swap.getFromCoin() + "-" + swap.getToCoin();
-            String backwardPair = swap.getToCoin() + "-" + swap.getFromCoin();
+        for (int i = 0; i < coinList.size() - 1; i++) {
+            String forwardPair = coinList.get(i) + "-" + coinList.get(i + 1);
+            String backwardPair = coinList.get(i + 1) + "-" + coinList.get(i);
             pairMap.put(forwardPair, backwardPair);
         }
+        String forwardPair = coinList.get(coinList.size() - 1) + "-" + coinList.get(0);
+        String backwardPair = coinList.get(0) + "-" + coinList.get(coinList.size() - 1);
+        pairMap.put(forwardPair, backwardPair);
         return pairMap;
     }
 

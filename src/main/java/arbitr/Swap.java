@@ -1,55 +1,46 @@
 package arbitr;
 
 import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
+
 @Getter
+@Setter
 public class Swap {
     private final String fromCoin;
     private final String toCoin;
-
-    // Это не котировка, это переводной коэффициент
-    // для OrderType.ASK ratio = 1/котировку
-    // для OrderType.BID ratio = котировка
-    private BigDecimal ratio;
-
     private final BigDecimal fee;
-    private  OrderType orderType;
+    private final boolean isReversNeed;
+    private final OrderType orderType;
+    private final String ticker;
+    private BigDecimal price;
 
-    public Swap(String fromCoin, String toCoin, BigDecimal fee) {
+    public Swap(String fromCoin, String toCoin,
+                BigDecimal fee, Boolean isReversNeed,
+                OrderType orderType, String ticker) {
         this.fromCoin = fromCoin;
         this.toCoin = toCoin;
         this.fee = fee;
-    }
-
-    public Swap(String fromCoin, String toCoin, BigDecimal fee, BigDecimal ratio) {
-        this.fromCoin = fromCoin;
-        this.toCoin = toCoin;
-        this.ratio = ratio;
-        this.fee = fee;
-    }
-
-    public String getCoinPair() {
-        switch (orderType) {
-            case BID -> {
-                return fromCoin + "-" + toCoin;
-            }
-            case ASK -> {
-                return toCoin + "-" + fromCoin;
-            }
-            default -> throw new RuntimeException("Unknown orderType = " + orderType);
-        }
-    }
-
-    public void setRatio(BigDecimal ratio) {
-        this.ratio = ratio;
-    }
-
-    public void setOrderType(OrderType orderType) {
+        this.isReversNeed = isReversNeed;
         this.orderType = orderType;
+        this.ticker = ticker;
+    }
+
+    public Swap(
+            String fromCoin, String toCoin, BigDecimal fee,
+            boolean isReversNeed, OrderType orderType, String ticker, BigDecimal price
+    ) {
+        this.fromCoin = fromCoin;
+        this.toCoin = toCoin;
+        this.fee = fee;
+        this.isReversNeed = isReversNeed;
+        this.orderType = orderType;
+        this.price = price;
+        this.ticker = ticker;
     }
 
     public String toString() {
-        return "from: " + fromCoin + " to: " + toCoin + " orderType: " + orderType;
+        return "from: " + fromCoin + " to: " + toCoin;
     }
 }

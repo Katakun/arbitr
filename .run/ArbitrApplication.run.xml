@@ -1,0 +1,18 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="ArbitrApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+    <envs>
+      <env name="CHAIN" value="XCN-&gt;BTC-&gt;USDC" />
+    </envs>
+    <module name="arbitr" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="arbitr.ArbitrApplication" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="arbitr.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
