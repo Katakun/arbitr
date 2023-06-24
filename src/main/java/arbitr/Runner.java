@@ -7,11 +7,17 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.List;
+
+import static arbitr.State.coinPairsFilteredlist;
+import static arbitr.State.pairMap;
+import static arbitr.State.swaps;
 
 @Log4j2
 @RequiredArgsConstructor
@@ -20,10 +26,18 @@ public class Runner implements CommandLineRunner {
     private static final CSVFormat CSV_FORMAT = CSVFormat.DEFAULT.builder()
             .setHeader(Headers.class)
             .build();
-    private final SwapProvider swapProvider;
+    private final PriceUpdater priceUpdater;
+
+    private final Parser parser;
+    private final Environment environment;
+
 
     @Override
     public void run(String... args) throws Exception {
+        List<String> coinList = parser.parse(environment.getProperty("CHAIN"));
+        pairMap = SwapUtils.toPairMap(coinList);
+        coinPairsFilteredlist = SwapUtils.getAndFilterPairs();
+        swaps = SwapUtils.createSwaps(coinPairsFilteredlist);
         KucoinPublicWSClient kucoinPublicWSClient = new KucoinClientBuilder().withBaseUrl("https://api.kucoin.com")
                 .buildPublicWSClient();
         try (
@@ -33,11 +47,11 @@ public class Runner implements CommandLineRunner {
             String requestId = kucoinPublicWSClient.onTicker(
                     new OnTickerCallback(
                             printer,
-                            swapProvider
+                            priceUpdater
                     ),
-                    "KCS-BTC",
-                    "DOGE-BTC",
-                    "DOGE-KCS"
+                    coinPairsFilteredlist.get(0),
+                    coinPairsFilteredlist.get(1),
+                    coinPairsFilteredlist.get(2)
             );
             pauseAndPing(kucoinPublicWSClient, requestId);
 

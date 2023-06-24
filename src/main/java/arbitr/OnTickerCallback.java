@@ -24,11 +24,11 @@ import java.util.stream.Collectors;
 public class OnTickerCallback implements KucoinAPICallback<KucoinEvent<TickerChangeEvent>> {
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private final CSVPrinter printer;
-    private final SwapProvider swapProvider;
+    private final PriceUpdater priceUpdater;
 
     @Override
     public void onResponse(KucoinEvent<TickerChangeEvent> response) throws KucoinApiException {
-        Optional<Swap[]> optionalSwaps = swapProvider.extract(response);
+        Optional<Swap[]> optionalSwaps = priceUpdater.updatePriceInSwaps(response);
 
         optionalSwaps.ifPresent(swaps -> {
             Optional<BigDecimal> percentOptional = Calculator.calculate(swaps);
