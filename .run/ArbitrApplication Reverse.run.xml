@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="ArbitrApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+  <configuration default="false" name="ArbitrApplication Reverse" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
     <envs>
-      <env name="CHAIN" value="KCS-&gt;DOGE-&gt;BTC" />
+      <env name="CHAIN" value="BTC-&gt;DOGE-&gt;KCS" />
     </envs>
     <module name="arbitr" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="arbitr.ArbitrApplication" />

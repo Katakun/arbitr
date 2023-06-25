@@ -5,6 +5,7 @@ import arbitr.Swap;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Optional;
 
 import static arbitr.Constants.FEE;
@@ -76,5 +77,58 @@ public class CalcTest {
         BigDecimal result = Calculator.getConversionRatio(swaps);
 
         assertEquals(new BigDecimal("1.500000000"), result);
+    }
+
+    @Test
+    public void getConversionRatioReversePositiveTest() {
+        int price1 = 2;
+        int price2 = 16;
+        int price3 = 4;
+
+        Swap[] swapsForward = {
+                new Swap("KCS", "DOGE", FEE, false, OrderType.BID, "", BigDecimal.valueOf(price1)),
+                new Swap("DOGE", "BTC", FEE, true, OrderType.BID, "", BigDecimal.valueOf(price2)),
+                new Swap("BTC", "KCS", FEE, false, OrderType.BID, "", BigDecimal.valueOf(price3))
+        };
+
+        Swap[] swapsBackward = {
+                new Swap("BTC", "DOGE", FEE, false, OrderType.BID, "", BigDecimal.valueOf(price2)),
+                new Swap("DOGE", "KCS", FEE, true, OrderType.BID, "", BigDecimal.valueOf(price1)),
+                new Swap("KCS", "BTC", FEE, true, OrderType.BID, "", BigDecimal.valueOf(price3)),
+        };
+
+        BigDecimal resultForward = Calculator.getConversionRatio(swapsForward);
+        BigDecimal resultBackward = Calculator.getConversionRatio(swapsBackward);
+
+        assertEquals(new BigDecimal("2.000000000"), resultForward);
+        assertEquals(new BigDecimal("0.5000000000"), resultBackward);
+
+        assertEquals(resultBackward, BigDecimal.ONE.divide(resultForward, 10, RoundingMode.HALF_UP));
+    }
+
+    @Test
+    public void getConversionRatioReversePositiveRealPriceTest() {
+        Double price2 = 0.000002193;
+        Double price1 = 0.009923;
+        Double price3 = 0.0002205;
+
+        Swap[] swapsForward = {
+                new Swap("KCS", "DOGE", FEE, false, OrderType.BID, "", BigDecimal.valueOf(price1)),
+                new Swap("DOGE", "BTC", FEE, true, OrderType.BID, "", BigDecimal.valueOf(price2)),
+                new Swap("BTC", "KCS", FEE, false, OrderType.BID, "", BigDecimal.valueOf(price3))
+        };
+
+        Swap[] swapsBackward = {
+                new Swap("BTC", "DOGE", FEE, false, OrderType.BID, "", BigDecimal.valueOf(price2)),
+                new Swap("DOGE", "KCS", FEE, true, OrderType.BID, "", BigDecimal.valueOf(price1)),
+                new Swap("KCS", "BTC", FEE, true, OrderType.BID, "", BigDecimal.valueOf(price3)),
+        };
+
+        BigDecimal resultForward = Calculator.getConversionRatio(swapsForward);
+        BigDecimal resultBackward = Calculator.getConversionRatio(swapsBackward);
+        System.out.println("resultForward " + resultForward);
+        System.out.println("resultBackwars " + resultBackward);
+
+        assertEquals(resultBackward, BigDecimal.ONE.divide(resultForward, 9, RoundingMode.HALF_UP));
     }
 }

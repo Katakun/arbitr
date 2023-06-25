@@ -40,10 +40,10 @@ public class Calculator {
         BigDecimal result = BigDecimal.ONE;
         Map<Boolean, List<Swap>> swapMap = Arrays.stream(swaps).collect(partitioningBy(Swap::isReversNeed));
 
-        for (Swap swap : swapMap.get(false)) {
+        for (Swap swap : swapMap.get(true)) {
             result = result.multiply(swap.getPrice());
         }
-        for (Swap swap : swapMap.get(true)) {
+        for (Swap swap : swapMap.get(false)) {
             result = result.divide(swap.getPrice(), 99999, RoundingMode.HALF_UP);
         }
         return result.round(new MathContext(10));

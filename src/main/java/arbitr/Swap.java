@@ -11,7 +11,7 @@ public class Swap {
     private final String fromCoin;
     private final String toCoin;
     private final BigDecimal fee;
-    private final boolean isReversNeed;
+    private final boolean isReversNeed; // if price exist in tickers -> false
     private final OrderType orderType;
     private final String ticker;
     private BigDecimal price;
