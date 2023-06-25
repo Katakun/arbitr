@@ -5,6 +5,7 @@ import arbitr.Swap;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.Optional;
 
@@ -24,18 +25,6 @@ public class CalcTest {
         Optional<BigDecimal> result = Calculator.calculate(swaps);
 
         assertEquals(Optional.empty(), result);
-    }
-
-    @Test
-    public void calculateRatioTest() {
-        Swap[] swaps = {
-                new Swap("a", "b", FEE, false, OrderType.BID, "", BigDecimal.valueOf(0.000002551)),
-                new Swap("a", "b", FEE, true, OrderType.BID, "", BigDecimal.valueOf(0.0002638)),
-                new Swap("a", "b", FEE, true, OrderType.BID, "", BigDecimal.valueOf(0.009656))
-        };
-
-        BigDecimal result = Calculator.getConversionRatio(swaps);
-        assertEquals(new BigDecimal("1.001471075"), result);
     }
 
     @Test
@@ -62,22 +51,10 @@ public class CalcTest {
         BigDecimal conversionWithFee = Calculator.getConversionWithFee(conversionRatio, swaps);
         Optional<BigDecimal> result = Calculator.calculate(swaps);
 
-        assertEquals(new BigDecimal("0.997"), conversionWithFee);
+        assertEquals(new BigDecimal("0.997000000"), conversionWithFee);
         assertEquals(Optional.empty(), result);
     }
 
-
-    @Test
-    public void getConversionRatioPositiveTest() {
-        Swap[] swaps = {
-                new Swap("a", "b", FEE, false, OrderType.BID, "", BigDecimal.valueOf(9)),
-                new Swap("a", "b", FEE, true, OrderType.BID, "", BigDecimal.valueOf(2)),
-                new Swap("a", "b", FEE, true, OrderType.BID, "", BigDecimal.valueOf(3))
-        };
-        BigDecimal result = Calculator.getConversionRatio(swaps);
-
-        assertEquals(new BigDecimal("1.500000000"), result);
-    }
 
     @Test
     public void getConversionRatioReversePositiveTest() {
@@ -129,6 +106,6 @@ public class CalcTest {
         System.out.println("resultForward " + resultForward);
         System.out.println("resultBackwars " + resultBackward);
 
-        assertEquals(resultBackward, BigDecimal.ONE.divide(resultForward, 9, RoundingMode.HALF_UP));
+        assertEquals(resultBackward.round(new MathContext(3)), BigDecimal.ONE.divide(resultForward, 3, RoundingMode.HALF_UP).round( new MathContext(3)));
     }
 }

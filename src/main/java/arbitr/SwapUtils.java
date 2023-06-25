@@ -55,9 +55,9 @@ public class SwapUtils {
         for (Map.Entry<String, String> entry : pairMap.entrySet()) {
             String[] coins = entry.getKey().split("-");
             if (coinPairsFilteredlist.contains(entry.getKey())) {
-                swaps[swapNumber++] = new Swap(coins[0], coins[1], FEE, false, OrderType.BID, entry.getKey());
+                swaps[swapNumber++] = new Swap(coins[0], coins[1], FEE, true, OrderType.BID, entry.getKey());
             } else if (coinPairsFilteredlist.contains(entry.getValue())) {
-                swaps[swapNumber++] = new Swap(coins[0], coins[1], FEE, true, OrderType.ASK, entry.getValue());
+                swaps[swapNumber++] = new Swap(coins[0], coins[1], FEE, false, OrderType.ASK, entry.getValue());
             } else {
                 throw new IllegalStateException(entry + " pair not in keys and not in values");
             }
