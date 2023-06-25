@@ -14,9 +14,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.List;
+import java.util.Map;
 
-import static arbitr.State.coinPairsFilteredlist;
-import static arbitr.State.pairMap;
 import static arbitr.State.swaps;
 
 @Log4j2
@@ -35,9 +34,9 @@ public class Runner implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         List<String> coinList = parser.parse(environment.getProperty("CHAIN"));
-        pairMap = SwapUtils.toPairMap(coinList);
-        coinPairsFilteredlist = SwapUtils.getAndFilterPairs();
-        swaps = SwapUtils.createSwaps(coinPairsFilteredlist);
+        Map<String, String> pairMap = SwapUtils.toPairMap(coinList);
+        List<String> coinPairsFilteredlist = SwapUtils.getAndFilterPairs(pairMap);
+        swaps = SwapUtils.createSwaps(coinPairsFilteredlist, pairMap);
         KucoinPublicWSClient kucoinPublicWSClient = new KucoinClientBuilder().withBaseUrl("https://api.kucoin.com")
                 .buildPublicWSClient();
         try (

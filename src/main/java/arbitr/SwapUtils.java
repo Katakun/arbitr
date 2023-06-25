@@ -11,7 +11,6 @@ import java.util.Map;
 
 import static arbitr.Constants.CHAIN_LENGTH;
 import static arbitr.Constants.FEE;
-import static arbitr.State.pairMap;
 
 public class SwapUtils {
 
@@ -32,7 +31,7 @@ public class SwapUtils {
         return pairMap;
     }
 
-    public static List<String> getAndFilterPairs() {
+    public static List<String> getAndFilterPairs(Map<String, String> pairMap) {
         KucoinClientBuilder builder = new KucoinClientBuilder().withBaseUrl("https://api.kucoin.com");
         KucoinRestClient kucoinRestClient = builder.buildRestClient();
         try {
@@ -50,7 +49,7 @@ public class SwapUtils {
         }
     }
 
-    public static Swap[] createSwaps(List<String> coinPairsFilteredlist) {
+    public static Swap[] createSwaps(List<String> coinPairsFilteredlist, Map<String, String> pairMap) {
         Swap[] swaps = new Swap[CHAIN_LENGTH];
         int swapNumber = 0;
         for (Map.Entry<String, String> entry : pairMap.entrySet()) {
