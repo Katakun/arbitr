@@ -33,14 +33,15 @@ public class Runner implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        List<String> coinList = parser.parse(environment.getProperty("CHAIN"));
+        String chain = environment.getProperty("CHAIN");
+        List<String> coinList = parser.parse(chain);
         Map<String, String> pairMap = SwapUtils.toPairMap(coinList);
         List<String> coinPairsFilteredlist = SwapUtils.getAndFilterPairs(pairMap);
         swaps = SwapUtils.createSwaps(coinPairsFilteredlist, pairMap);
         KucoinPublicWSClient kucoinPublicWSClient = new KucoinClientBuilder().withBaseUrl("https://api.kucoin.com")
                 .buildPublicWSClient();
         try (
-                Writer writer = new FileWriter("share/arbitr.csv");
+                Writer writer = new FileWriter("share/" + chain.replace("->", "-") + "_arbitr.csv");
                 CSVPrinter printer = new CSVPrinter(writer, CSV_FORMAT)
         ) {
             String requestId = kucoinPublicWSClient.onTicker(
