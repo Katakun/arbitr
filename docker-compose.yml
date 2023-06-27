@@ -1,0 +1,17 @@
+services:
+  arbitr1:
+    build: .
+    environment:
+      CHAIN: "KCS->DOGE->BTC"
+  arbitr2:
+    build: .
+    environment:
+      CHAIN: "BTC->DOGE->KCS"
+  arbitr3:
+    build: .
+    environment:
+      CHAIN: "KCS->VET->BTC"
+  arbitr4:
+    build: .
+    environment:
+      CHAIN: "BTC->VET->KCS"
