@@ -3,15 +3,23 @@ services:
     build: .
     environment:
       CHAIN: "KCS->DOGE->BTC"
+    volumes:
+      - ./share:/app/share
   arbitr2:
     build: .
     environment:
       CHAIN: "BTC->DOGE->KCS"
+    volumes:
+      - ./share:/app/share
   arbitr3:
     build: .
     environment:
       CHAIN: "KCS->VET->BTC"
+    volumes:
+      - ./share:/app/share
   arbitr4:
     build: .
     environment:
       CHAIN: "BTC->VET->KCS"
+    volumes:
+      - ./share:/app/share
