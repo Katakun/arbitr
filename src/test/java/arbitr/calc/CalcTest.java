@@ -51,7 +51,7 @@ public class CalcTest {
         BigDecimal conversionWithFee = Calculator.getConversionWithFee(conversionRatio, swaps);
         Optional<BigDecimal> result = Calculator.calculate(swaps);
 
-        assertEquals(new BigDecimal("0.997000000"), conversionWithFee);
+        assertEquals(new BigDecimal("1.003000000"), conversionWithFee);
         assertEquals(Optional.empty(), result);
     }
 
