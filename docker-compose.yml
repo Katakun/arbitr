@@ -2,16 +2,15 @@ services:
   arbitr1:
     build: .
     environment:
-      CHAIN: "BTC->XMR->USDT"
+      CHAIN: "USDT->XMR->BTC"
     volumes:
       - ./share:/app/share
     restart: "no"
 
-
   arbitr2:
     build: .
     environment:
-      CHAIN: "USDT->XMR->BTC"
+      CHAIN: "USDT->BNB->BTC"
     volumes:
       - ./share:/app/share
     restart: "no"
@@ -21,7 +20,7 @@ services:
   arbitr3:
     build: .
     environment:
-      CHAIN: "BTC->BNB->USDT"
+      CHAIN: "USDT->ZEC->BTC"
     volumes:
       - ./share:/app/share
     restart: "no"
@@ -31,10 +30,490 @@ services:
   arbitr4:
     build: .
     environment:
-      CHAIN: "BTC->BNB->USDC"
+      CHAIN: "USDT->ADA->BTC"
     volumes:
       - ./share:/app/share
     restart: "no"
     depends_on:
       - arbitr3
+
+  arbitr5:
+    build: .
+    environment:
+      CHAIN: "USDT->VRA->BTC"
+    volumes:
+      - ./share:/app/share
+    restart: "no"
+    depends_on:
+      - arbitr4
+
+  arbitr6:
+    build: .
+    environment:
+      CHAIN: "USDT->STX->BTC"
+    volumes:
+      - ./share:/app/share
+    restart: "no"
+    depends_on:
+      - arbitr5
+
+  arbitr7:
+    build: .
+    environment:
+      CHAIN: "USDT->EWT->BTC"
+    volumes:
+      - ./share:/app/share
+    restart: "no"
+    depends_on:
+      - arbitr6
+
+  arbitr8:
+    build: .
+    environment:
+      CHAIN: "BTC->XRP->USDC"
+    volumes:
+      - ./share:/app/share
+    restart: "no"
+    depends_on:
+      - arbitr7
+
+  arbitr9:
+    build: .
+    environment:
+      CHAIN: "USDC->USDT->TUSD"
+    volumes:
+      - ./share:/app/share
+    restart: "no"
+    depends_on:
+      - arbitr8
+
+  arbitr10:
+    build: .
+    environment:
+      CHAIN: "USDC->ETH->USDT"
+    volumes:
+      - ./share:/app/share
+    restart: "no"
+    depends_on:
+      - arbitr9
+
+  arbitr11:
+    build: .
+    environment:
+      CHAIN: "USDT->BTC->TUSD"
+    volumes:
+      - ./share:/app/share
+    restart: "no"
+    depends_on:
+      - arbitr10
+
+  arbitr12:
+    build: .
+    environment:
+      CHAIN: "USDT->XRP->USDC"
+    volumes:
+      - ./share:/app/share
+    restart: "no"
+    depends_on:
+      - arbitr11
+
+  arbitr13:
+    build: .
+    environment:
+      CHAIN: "USDT->XRP->BTC"
+    volumes:
+      - ./share:/app/share
+    restart: "no"
+    depends_on:
+      - arbitr12
+
+  arbitr14:
+    build: .
+    environment:
+      CHAIN: "DAI->USDT->TUSD"
+    volumes:
+      - ./share:/app/share
+    restart: "no"
+    depends_on:
+      - arbitr13
+
+  arbitr15:
+    build: .
+    environment:
+      CHAIN: "DAI->USDT->USDC"
+    volumes:
+      - ./share:/app/share
+    restart: "no"
+    depends_on:
+      - arbitr14
+
+  arbitr16:
+    build: .
+    environment:
+      CHAIN: "BTC->ETH->USDT"
+    volumes:
+      - ./share:/app/share
+    restart: "no"
+    depends_on:
+      - arbitr15
+
+  arbitr17:
+    build: .
+    environment:
+      CHAIN: "BTC->ETH->USDC"
+    volumes:
+      - ./share:/app/share
+    restart: "no"
+    depends_on:
+      - arbitr16
+
+  arbitr18:
+    build: .
+    environment:
+      CHAIN: "DAI->BTC->TUSD"
+    volumes:
+      - ./share:/app/share
+    restart: "no"
+    depends_on:
+      - arbitr17
+
+  arbitr19:
+    build: .
+    environment:
+      CHAIN: "DAI->BTC->USDT"
+    volumes:
+      - ./share:/app/share
+    restart: "no"
+    depends_on:
+      - arbitr18
+
+  arbitr20:
+    build: .
+    environment:
+      CHAIN: "BTC->LTC->USDT"
+    volumes:
+      - ./share:/app/share
+    restart: "no"
+    depends_on:
+      - arbitr19
+
+  arbitr21:
+    build: .
+    environment:
+      CHAIN: "USDC->BTC->TUSD"
+    volumes:
+      - ./share:/app/share
+    restart: "no"
+    depends_on:
+      - arbitr20
+
+  arbitr22:
+    build: .
+    environment:
+      CHAIN: "USDC->BTC->USDT"
+    volumes:
+      - ./share:/app/share
+    restart: "no"
+    depends_on:
+      - arbitr21
+
+  arbitr23:
+    build: .
+    environment:
+      CHAIN: "USDC->BTC->DAI"
+    volumes:
+      - ./share:/app/share
+    restart: "no"
+    depends_on:
+      - arbitr22
+
+  arbitr24:
+    build: .
+    environment:
+      CHAIN: "USDT->BCH->BTC"
+    volumes:
+      - ./share:/app/share
+    restart: "no"
+    depends_on:
+      - arbitr23
+
+  arbitr25:
+    build: .
+    environment:
+      CHAIN: "USDC->ADA->BTC"
+    volumes:
+      - ./share:/app/share
+    restart: "no"
+    depends_on:
+      - arbitr24
+
+  arbitr26:
+    build: .
+    environment:
+      CHAIN: "USDC->DOGE->USDT"
+    volumes:
+      - ./share:/app/share
+    restart: "no"
+    depends_on:
+      - arbitr25
+
+  arbitr27:
+    build: .
+    environment:
+      CHAIN: "BTC->TRIAS->USDT"
+    volumes:
+      - ./share:/app/share
+    restart: "no"
+    depends_on:
+      - arbitr26
+
+  arbitr28:
+    build: .
+    environment:
+      CHAIN: "USDC->SOL->USDT"
+    volumes:
+      - ./share:/app/share
+    restart: "no"
+    depends_on:
+      - arbitr27
+
+  arbitr29:
+    build: .
+    environment:
+      CHAIN: "USDC->BNB->BTC"
+    volumes:
+      - ./share:/app/share
+    restart: "no"
+    depends_on:
+      - arbitr28
+
+  arbitr30:
+    build: .
+    environment:
+      CHAIN: "USDC->BNB->USDT"
+    volumes:
+      - ./share:/app/share
+    restart: "no"
+    depends_on:
+      - arbitr29
+
+  arbitr31:
+    build: .
+    environment:
+      CHAIN: "BRL->BTC->TUSD"
+    volumes:
+      - ./share:/app/share
+    restart: "no"
+    depends_on:
+      - arbitr30
+
+  arbitr32:
+    build: .
+    environment:
+      CHAIN: "BRL->BTC->USDT"
+    volumes:
+      - ./share:/app/share
+    restart: "no"
+    depends_on:
+      - arbitr31
+
+  arbitr33:
+    build: .
+    environment:
+      CHAIN: "BRL->BTC->DAI"
+    volumes:
+      - ./share:/app/share
+    restart: "no"
+    depends_on:
+      - arbitr32
+
+  arbitr34:
+    build: .
+    environment:
+      CHAIN: "BRL->BTC->USDC"
+    volumes:
+      - ./share:/app/share
+    restart: "no"
+    depends_on:
+      - arbitr33
+
+  arbitr35:
+    build: .
+    environment:
+      CHAIN: "BRL->USDT->TUSD"
+    volumes:
+      - ./share:/app/share
+    restart: "no"
+    depends_on:
+      - arbitr34
+
+  arbitr36:
+    build: .
+    environment:
+      CHAIN: "BRL->USDT->USDC"
+    volumes:
+      - ./share:/app/share
+    restart: "no"
+    depends_on:
+      - arbitr35
+
+  arbitr37:
+    build: .
+    environment:
+      CHAIN: "BRL->USDT->DAI"
+    volumes:
+      - ./share:/app/share
+    restart: "no"
+    depends_on:
+      - arbitr36
+
+  arbitr38:
+    build: .
+    environment:
+      CHAIN: "EUR->BTC->TUSD"
+    volumes:
+      - ./share:/app/share
+    restart: "no"
+    depends_on:
+      - arbitr37
+
+  arbitr39:
+    build: .
+    environment:
+      CHAIN: "EUR->BTC->USDT"
+    volumes:
+      - ./share:/app/share
+    restart: "no"
+    depends_on:
+      - arbitr38
+
+  arbitr40:
+    build: .
+    environment:
+      CHAIN: "EUR->BTC->DAI"
+    volumes:
+      - ./share:/app/share
+    restart: "no"
+    depends_on:
+      - arbitr39
+
+  arbitr41:
+    build: .
+    environment:
+      CHAIN: "EUR->BTC->USDC"
+    volumes:
+      - ./share:/app/share
+    restart: "no"
+    depends_on:
+      - arbitr40
+
+  arbitr42:
+    build: .
+    environment:
+      CHAIN: "EUR->BTC->BRL"
+    volumes:
+      - ./share:/app/share
+    restart: "no"
+    depends_on:
+      - arbitr41
+
+  arbitr43:
+    build: .
+    environment:
+      CHAIN: "EUR->USDT->TUSD"
+    volumes:
+      - ./share:/app/share
+    restart: "no"
+    depends_on:
+      - arbitr42
+
+  arbitr44:
+    build: .
+    environment:
+      CHAIN: "EUR->USDT->USDC"
+    volumes:
+      - ./share:/app/share
+    restart: "no"
+    depends_on:
+      - arbitr43
+
+  arbitr45:
+    build: .
+    environment:
+      CHAIN: "EUR->USDT->DAI"
+    volumes:
+      - ./share:/app/share
+    restart: "no"
+    depends_on:
+      - arbitr44
+
+  arbitr46:
+    build: .
+    environment:
+      CHAIN: "EUR->USDT->BRL"
+    volumes:
+      - ./share:/app/share
+    restart: "no"
+    depends_on:
+      - arbitr45
+
+  arbitr47:
+    build: .
+    environment:
+      CHAIN: "BTC->BDX->USDT"
+    volumes:
+      - ./share:/app/share
+    restart: "no"
+    depends_on:
+      - arbitr46
+
+  arbitr48:
+    build: .
+    environment:
+      CHAIN: "GBP->USDT->TUSD"
+    volumes:
+      - ./share:/app/share
+    restart: "no"
+    depends_on:
+      - arbitr47
+
+  arbitr49:
+    build: .
+    environment:
+      CHAIN: "GBP->USDT->USDC"
+    volumes:
+      - ./share:/app/share
+    restart: "no"
+    depends_on:
+      - arbitr48
+
+  arbitr50:
+    build: .
+    environment:
+      CHAIN: "GBP->USDT->DAI"
+    volumes:
+      - ./share:/app/share
+    restart: "no"
+    depends_on:
+      - arbitr49
+
+  arbitr51:
+    build: .
+    environment:
+      CHAIN: "GBP->USDT->BRL"
+    volumes:
+      - ./share:/app/share
+    restart: "no"
+    depends_on:
+      - arbitr50
+
+  arbitr52:
+    build: .
+    environment:
+      CHAIN: "GBP->USDT->EUR"
+    volumes:
+      - ./share:/app/share
+    restart: "no"
+    depends_on:
+      - arbitr51
 
