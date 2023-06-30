@@ -3,4 +3,4 @@ HEALTHCHECK --interval=2s --timeout=10s --retries=10 CMD curl http://localhost:8
 WORKDIR /app
 COPY /target/arbitr-0.0.1-SNAPSHOT.jar /app
 RUN mkdir share
-ENTRYPOINT ["java", "-jar", "arbitr-0.0.1-SNAPSHOT.jar"]
+ENTRYPOINT ["java","-Xms50m", "-Xmx50m", "-jar", "arbitr-0.0.1-SNAPSHOT.jar"]
