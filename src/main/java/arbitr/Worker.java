@@ -12,10 +12,11 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 @Log4j2
 @RequiredArgsConstructor
-public class Worker implements Runnable {
+public class Worker implements Callable<Void> {
     private static final CSVFormat CSV_FORMAT = CSVFormat.DEFAULT.builder()
             .setHeader(Headers.class)
             .build();
@@ -23,7 +24,7 @@ public class Worker implements Runnable {
     private final PriceUpdater priceUpdater;
     private final String chain;
 
-    public void run() {
+    public Void call() {
         List<String> coinList = parser.parse(chain);
         Map<String, String> pairMap = SwapUtils.toPairMap(coinList);
         List<String> coinPairsFilteredlist = SwapUtils.getAndFilterPairs(pairMap);
@@ -49,6 +50,7 @@ public class Worker implements Runnable {
         } catch (IOException | InterruptedException e) {
             log.warn(e);
         }
+        return null;
     }
 
     @SuppressWarnings({"InfiniteLoopStatement", "BusyWait"})

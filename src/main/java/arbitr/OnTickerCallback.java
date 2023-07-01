@@ -28,16 +28,18 @@ public class OnTickerCallback implements KucoinAPICallback<KucoinEvent<TickerCha
     private final Swap[] swaps;
 
     @Override
-    public void onResponse(KucoinEvent<TickerChangeEvent> response) throws KucoinApiException {
-        Optional<Swap[]> optionalSwaps = priceUpdater.updatePriceInSwaps(response, swaps);
-        optionalSwaps.ifPresent(swaps -> {
-            Optional<BigDecimal> percentOptional = Calculator.calculate(swaps);
-            LocalDateTime dateTime = LocalDateTime.now();
-            percentOptional.ifPresent(percent -> {
-                List<BigDecimal> ratios = Arrays.stream(swaps).map(Swap::getPrice).collect(Collectors.toList());
-                save(printer, ratios, percent, dateTime);
+    public synchronized void onResponse(KucoinEvent<TickerChangeEvent> response) throws KucoinApiException {
+        synchronized (OnTickerCallback.class) {
+            Optional<Swap[]> optionalSwaps = priceUpdater.updatePriceInSwaps(response, swaps);
+            optionalSwaps.ifPresent(swaps -> {
+                Optional<BigDecimal> percentOptional = Calculator.calculate(swaps);
+                LocalDateTime dateTime = LocalDateTime.now();
+                percentOptional.ifPresent(percent -> {
+                    List<BigDecimal> ratios = Arrays.stream(swaps).map(Swap::getPrice).collect(Collectors.toList());
+                    save(printer, ratios, percent, dateTime);
+                });
             });
-        });
+        }
     }
 
     private void save(
