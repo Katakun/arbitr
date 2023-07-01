@@ -10,7 +10,6 @@ import java.math.BigDecimal;
 import java.util.Optional;
 
 import static arbitr.Constants.CHAIN_LENGTH;
-import static arbitr.State.swaps;
 
 @Log4j2
 @RequiredArgsConstructor
@@ -19,14 +18,14 @@ public class PriceUpdater {
 
     private int notInitializedSwapCount = CHAIN_LENGTH;
 
-    public Optional<Swap[]> updatePriceInSwaps(KucoinEvent<TickerChangeEvent> response) {
-        if (updatePrice(response).isPresent()) {
+    public Optional<Swap[]> updatePriceInSwaps(KucoinEvent<TickerChangeEvent> response, Swap[] swaps) {
+        if (updatePrice(response, swaps).isPresent()) {
             return Optional.of(swaps);
         }
         return Optional.empty();
     }
 
-    private Optional<Swap[]> updatePrice(KucoinEvent<TickerChangeEvent> response) {
+    private Optional<Swap[]> updatePrice(KucoinEvent<TickerChangeEvent> response, Swap[] swaps) {
         // topic = /market/ticker:KCS-BTC
         String topic = response.getTopic().split(":")[1];
         for (Swap swap : swaps) {

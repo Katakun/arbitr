@@ -16,8 +16,6 @@ import java.io.Writer;
 import java.util.List;
 import java.util.Map;
 
-import static arbitr.State.swaps;
-
 @Log4j2
 @RequiredArgsConstructor
 @Component
@@ -26,7 +24,6 @@ public class Runner implements CommandLineRunner {
             .setHeader(Headers.class)
             .build();
     private final PriceUpdater priceUpdater;
-
     private final Parser parser;
     private final Environment environment;
 
@@ -34,10 +31,13 @@ public class Runner implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         String chain = environment.getProperty("CHAIN");
+        if (null == chain || chain.isEmpty()) {
+            throw new IllegalArgumentException("Chain is empty");
+        }
         List<String> coinList = parser.parse(chain);
         Map<String, String> pairMap = SwapUtils.toPairMap(coinList);
         List<String> coinPairsFilteredlist = SwapUtils.getAndFilterPairs(pairMap);
-        swaps = SwapUtils.createSwaps(coinPairsFilteredlist, pairMap);
+        Swap[] swaps = SwapUtils.createSwaps(coinPairsFilteredlist, pairMap);
         KucoinPublicWSClient kucoinPublicWSClient = new KucoinClientBuilder().withBaseUrl("https://api.kucoin.com")
                 .buildPublicWSClient();
         try (
@@ -47,7 +47,8 @@ public class Runner implements CommandLineRunner {
             String requestId = kucoinPublicWSClient.onTicker(
                     new OnTickerCallback(
                             printer,
-                            priceUpdater
+                            priceUpdater,
+                            swaps
                     ),
                     coinPairsFilteredlist.get(0),
                     coinPairsFilteredlist.get(1),
