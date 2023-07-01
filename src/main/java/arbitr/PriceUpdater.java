@@ -9,14 +9,10 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.util.Optional;
 
-import static arbitr.Constants.CHAIN_LENGTH;
-
 @Log4j2
 @RequiredArgsConstructor
 @Component
 public class PriceUpdater {
-
-    private int notInitializedSwapCount = CHAIN_LENGTH;
 
     public Optional<Swap[]> updatePriceInSwaps(KucoinEvent<TickerChangeEvent> response, Swap[] swaps) {
         if (updatePrice(response, swaps).isPresent()) {
@@ -36,15 +32,15 @@ public class PriceUpdater {
                         : response.getData().getBestBid();
                 if (oldPrice == null) {
                     swap.setPrice(newPrice);
-                    log.info("initializing " + notInitializedSwapCount);
-                    notInitializedSwapCount--;
-                    if (notInitializedSwapCount > 0) {
+                    int notInitializedSwapAmount = getNotInitializedSwapAmount(swaps);
+                    log.info("initializing " + notInitializedSwapAmount);
+                    if (notInitializedSwapAmount > 0) {
                         return Optional.empty();
                     }
                     return Optional.of(swaps);
                 } else if (oldPrice.compareTo(newPrice) != 0) {
                     swap.setPrice(newPrice);
-                    if (notInitializedSwapCount > 0) {
+                    if (getNotInitializedSwapAmount(swaps) > 0) {
                         return Optional.empty();
                     } else {
                         return Optional.of(swaps);
@@ -55,5 +51,15 @@ public class PriceUpdater {
             }
         }
         throw new IllegalStateException("Not found ticker in swaps: " + topic);
+    }
+
+    private int getNotInitializedSwapAmount(Swap[] swaps) {
+        int nullCount = 0;
+        for (Swap swap : swaps) {
+            if (swap.getPrice() == null) {
+                nullCount++;
+            }
+        }
+        return nullCount;
     }
 }

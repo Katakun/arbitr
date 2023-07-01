@@ -31,6 +31,6 @@ public class Runner implements CommandLineRunner {
         ExecutorService executor = Executors.newFixedThreadPool(
                 workerList.size(), runnable -> new Thread(runnable, "arbitrThread"));
         executor.invokeAll(workerList);
-
+        executor.shutdown();
     }
 }

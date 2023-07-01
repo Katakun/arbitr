@@ -41,6 +41,6 @@ public class Swap {
     }
 
     public String toString() {
-        return "from: " + fromCoin + " to: " + toCoin;
+        return fromCoin + ">" + toCoin;
     }
 }

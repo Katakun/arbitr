@@ -24,7 +24,7 @@ public class Calculator {
         lock.lock();
         try {
             BigDecimal conversionRatio = getConversionRatio(swaps);
-            log.info("conversionRatio = " + conversionRatio);
+            log.info("convRatio: " + conversionRatio + " chain: " + Arrays.toString(swaps) + " thread: " + Thread.currentThread().getId());
             BigDecimal conversionWithFee = getConversionWithFee(conversionRatio, swaps);
             BigDecimal percent = conversionWithFee.subtract(BigDecimal.valueOf(1)).multiply(BigDecimal.valueOf(100));
             return percent.abs().compareTo(BigDecimal.valueOf(0.5)) > 0 ? Optional.of(percent) : Optional.empty();
