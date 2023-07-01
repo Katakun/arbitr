@@ -5,6 +5,7 @@ import com.kucoin.sdk.KucoinRestClient;
 import com.kucoin.sdk.rest.response.MarketTickerResponse;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +32,7 @@ public class SwapUtils {
         return pairMap;
     }
 
-    public static List<String> getAndFilterPairs(Map<String, String> pairMap) {
+    public static List<String> getAndFilterPairs(Map<String, String> pairMap, String chain) {
         KucoinClientBuilder builder = new KucoinClientBuilder().withBaseUrl("https://api.kucoin.com");
         KucoinRestClient kucoinRestClient = builder.buildRestClient();
         try {
@@ -40,13 +41,25 @@ public class SwapUtils {
                     .map(coinPairString -> coinPairString.getSymbol().toUpperCase())
                     .filter(coinPairString -> pairMap.containsKey(coinPairString) || pairMap.containsValue(coinPairString))
                     .toList();
+            coinPairsFilteredlist = removeDuplicate(coinPairsFilteredlist);
             if (coinPairsFilteredlist.size() != CHAIN_LENGTH) {
-                throw new IllegalStateException("The quantity of coin pair != " + CHAIN_LENGTH);
+                throw new IllegalStateException("Amount of coin pair != " + CHAIN_LENGTH + " coin pair = " + coinPairsFilteredlist + " chain: " + chain);
             }
             return coinPairsFilteredlist;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static List<String> removeDuplicate(List<String> pairs) {
+        List<String> result = new ArrayList<>();
+        for (String pair : pairs) {
+            String[] curCoins= pair.split("-");
+            String reversedPair = curCoins[1] +  "-" + curCoins[0];
+            if (result.contains(reversedPair)) continue;
+            result.add(pair);
+        }
+        return result;
     }
 
     public static Swap[] createSwaps(List<String> coinPairsFilteredlist, Map<String, String> pairMap) {

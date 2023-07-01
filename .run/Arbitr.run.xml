@@ -1,0 +1,12 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Arbitr" type="Application" factoryName="Application">
+    <envs>
+      <env name="CHAINS" value="USDT-&gt;ADA-&gt;BTC,USDC-&gt;DOGE-&gt;USDT,USDC-&gt;ETH-&gt;USDT,USDC-&gt;DOGE-&gt;BTC,USDT-&gt;XRP-&gt;USDC,USDT-&gt;BCH-&gt;BTC,USDT-&gt;SOL-&gt;USDC,USDC-&gt;LTC-&gt;USDT,USDT-&gt;BNB-&gt;USDC,USDC-&gt;ETH-&gt;BTC,BTC-&gt;LTC-&gt;USDT,BTC-&gt;ETH-&gt;USDT,USDC-&gt;XRP-&gt;BTC,BTC-&gt;DASH-&gt;USDT,USDC-&gt;LTC-&gt;BTC,USDT-&gt;LTC-&gt;USDC,BTC-&gt;BCH-&gt;USDT,BTC-&gt;ADA-&gt;USDT,BTC-&gt;EWT-&gt;USDT,USDT-&gt;OUSD-&gt;BTC,BTC-&gt;MATIC-&gt;USDT,BTC-&gt;XMR-&gt;USDT,BTC-&gt;DOGE-&gt;USDC,USDT-&gt;EWT-&gt;BTC,USDT-&gt;XMR-&gt;BTC,TRX-&gt;KLV-&gt;USDT,USDC-&gt;SOL-&gt;USDT,BTC-&gt;XRP-&gt;USDT,USDT-&gt;ETH-&gt;USDC,USDT-&gt;BDX-&gt;BTC,USDT-&gt;DOGE-&gt;USDC,USDT-&gt;DOGE-&gt;BTC,USDC-&gt;BNB-&gt;USDT,BTC-&gt;BNB-&gt;USDT,BTC-&gt;OUSD-&gt;USDT,BTC-&gt;XRP-&gt;USDC,USDC-&gt;BNB-&gt;BTC,BTC-&gt;BNB-&gt;USDC,USDT-&gt;XRP-&gt;BTC,BTC-&gt;LTC-&gt;USDC,USDT-&gt;BNB-&gt;BTC,USDC-&gt;XRP-&gt;USDT,USDT-&gt;BTC-&gt;USDC,USDT-&gt;MATIC-&gt;BTC,USDC-&gt;BTC-&gt;USDT,BTC-&gt;ETH-&gt;USDC,USDT-&gt;KLV-&gt;TRX,USDT-&gt;LTC-&gt;BTC,BTC-&gt;DOGE-&gt;USDT,USDT-&gt;ETH-&gt;BTC,BTC-&gt;BDX-&gt;USDT,USDT-&gt;DASH-&gt;BTC" />
+    </envs>
+    <option name="MAIN_CLASS_NAME" value="arbitr.ArbitrApplication" />
+    <module name="arbitr" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

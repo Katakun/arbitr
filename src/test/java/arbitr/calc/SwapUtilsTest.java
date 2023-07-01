@@ -52,4 +52,11 @@ public class SwapUtilsTest {
         assertEquals("KCS-BTC", swaps[2].getTicker());
         assertNull(swaps[2].getPrice());
     }
+
+    @Test
+    public void removeDuplicateTest() {
+        List<String> testList = List.of("USDC-USDT", "USDT-USDC", "LTC-USDC", "LTC-USDT");
+        List<String> result = List.of("USDC-USDT", "LTC-USDC", "LTC-USDT");
+        assertEquals(result, SwapUtils.removeDuplicate(testList));
+    }
 }
