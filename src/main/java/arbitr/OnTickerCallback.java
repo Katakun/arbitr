@@ -11,8 +11,9 @@ import org.apache.commons.csv.CSVPrinter;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
@@ -33,10 +34,12 @@ public class OnTickerCallback implements KucoinAPICallback<KucoinEvent<TickerCha
             Optional<Swap[]> optionalSwaps = priceUpdater.updatePriceInSwaps(response, swaps);
             optionalSwaps.ifPresent(swaps -> {
                 Optional<BigDecimal> percentOptional = Calculator.calculate(swaps);
-                LocalDateTime dateTime = LocalDateTime.now();
+                ZonedDateTime dateTime = ZonedDateTime.now().withZoneSameInstant(ZoneOffset.UTC);
+                Instant instant = dateTime.toInstant();
+                long milliseconds = instant.toEpochMilli();
                 percentOptional.ifPresent(percent -> {
                     List<BigDecimal> ratios = Arrays.stream(swaps).map(Swap::getPrice).collect(Collectors.toList());
-                    save(printer, ratios, percent, dateTime);
+                    save(printer, ratios, percent, dateTime, milliseconds);
                 });
             });
         }
@@ -44,10 +47,10 @@ public class OnTickerCallback implements KucoinAPICallback<KucoinEvent<TickerCha
 
     private void save(
             CSVPrinter printer, List<BigDecimal> ratios,
-            BigDecimal percent, LocalDateTime dateTime
+            BigDecimal percent, ZonedDateTime dateTime, long milliseconds
     ) {
         try {
-            printer.printRecord(dateTime.format(FORMATTER), Timestamp.valueOf(dateTime).getNanos(),
+            printer.printRecord(dateTime.format(FORMATTER), milliseconds,
                     ratios.get(0), ratios.get(1), ratios.get(2), percent);
             printer.flush();
         } catch (IOException e) {
