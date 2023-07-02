@@ -16,21 +16,31 @@ import java.util.Map;
 @Log4j2
 @RequiredArgsConstructor
 public class Worker implements Runnable {
-    private static final CSVFormat CSV_FORMAT = CSVFormat.DEFAULT.builder()
-            .setHeader(Headers.class)
-            .build();
     private final Parser parser;
     private final PriceUpdater priceUpdater;
     private final String chain;
+
+    private static CSVFormat getCsvFormat(List<String> coinPairsFilteredlist) {
+        return CSVFormat.DEFAULT.builder()
+                .setHeader(
+                        "Data",
+                        "Timestamp",
+                        coinPairsFilteredlist.get(0),
+                        coinPairsFilteredlist.get(1),
+                        coinPairsFilteredlist.get(2),
+                        "Profit ratio")
+                .build();
+    }
 
     public void run() {
         List<String> coinList = parser.parse(chain);
         Map<String, String> pairMap = SwapUtils.toPairMap(coinList);
         List<String> coinPairsFilteredlist = SwapUtils.getAndFilterPairs(pairMap, chain);
         Swap[] swaps = SwapUtils.createSwaps(coinPairsFilteredlist, pairMap);
+
         try (
                 Writer writer = new FileWriter("share/" + chain.replace("->", "-") + "_arbitr.csv");
-                CSVPrinter printer = new CSVPrinter(writer, CSV_FORMAT)
+                CSVPrinter printer = new CSVPrinter(writer, getCsvFormat(coinPairsFilteredlist))
         ) {
             KucoinPublicWSClient kucoinPublicWSClient = new KucoinClientBuilder().withBaseUrl("https://api.kucoin.com")
                     .buildPublicWSClient();
