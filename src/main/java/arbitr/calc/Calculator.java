@@ -27,7 +27,7 @@ public class Calculator {
             log.info("convRatio: " + conversionRatio + " chain: " + Arrays.toString(swaps) + " thread: " + Thread.currentThread().getId());
             BigDecimal conversionWithFee = getConversionWithFee(conversionRatio, swaps);
             BigDecimal percent = conversionWithFee.subtract(BigDecimal.valueOf(1)).multiply(BigDecimal.valueOf(100));
-            return percent.abs().compareTo(BigDecimal.valueOf(0.5)) > 0 ? Optional.of(percent) : Optional.empty();
+            return percent.compareTo(BigDecimal.ZERO) > 0 ? Optional.of(percent) : Optional.empty();
         } finally {
             lock.unlock();
         }
@@ -41,7 +41,7 @@ public class Calculator {
             for (Swap swap : swaps) {
                 commonFee = commonFee.add(swap.getFee());
             }
-            return conversionRatio.compareTo(BigDecimal.ONE) > 0 ? conversionRatio.subtract(commonFee) : conversionRatio.add(commonFee);
+            return conversionRatio.subtract(commonFee);
         } finally {
             lock.unlock();
         }

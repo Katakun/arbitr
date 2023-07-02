@@ -35,7 +35,7 @@ public class CalcTest {
                 new Swap("a", "b", FEE, true, OrderType.BID, "", BigDecimal.valueOf(0.009656))
         };
 
-        BigDecimal conversionWithFee = Calculator.getConversionWithFee(BigDecimal.valueOf(1.004), swaps);
+        BigDecimal conversionWithFee = Calculator.getConversionWithFee(BigDecimal.valueOf(1.010), swaps);
 
         assertEquals(new BigDecimal("1.001"), conversionWithFee);
     }
@@ -51,7 +51,7 @@ public class CalcTest {
         BigDecimal conversionWithFee = Calculator.getConversionWithFee(conversionRatio, swaps);
         Optional<BigDecimal> result = Calculator.calculate(swaps);
 
-        assertEquals(new BigDecimal("1.003000000"), conversionWithFee);
+        assertEquals(new BigDecimal("0.991000000"), conversionWithFee);
         assertEquals(Optional.empty(), result);
     }
 
