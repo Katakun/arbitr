@@ -42,10 +42,12 @@ docker build -t arbitr .
 ```
 
 # How to run own image
+![Screenshot](src/img/arbitr-start.png)
 (you need share directory)
 ```commandline
 docker run -e "CHAINS=USDT->ADA->BTC,USDC->DOGE->USDT,USDC->ETH->USDT,USDC->DOGE->BTC,USDT->XRP->USDC,USDT->BCH->BTC,USDT->SOL->USDC,USDC->LTC->USDT,USDT->BNB->USDC,USDC->ETH->BTC,BTC->LTC->USDT,BTC->ETH->USDT,USDC->XRP->BTC,BTC->DASH->USDT,USDC->LTC->BTC,USDT->LTC->USDC,BTC->BCH->USDT,BTC->ADA->USDT,BTC->EWT->USDT,USDT->OUSD->BTC,BTC->MATIC->USDT,BTC->XMR->USDT,BTC->DOGE->USDC,USDT->EWT->BTC,USDT->XMR->BTC,TRX->KLV->USDT,USDC->SOL->USDT,BTC->XRP->USDT,USDT->ETH->USDC,USDT->BDX->BTC,USDT->DOGE->USDC,USDT->DOGE->BTC,USDC->BNB->USDT,BTC->BNB->USDT,BTC->OUSD->USDT,BTC->XRP->USDC,USDC->BNB->BTC,BTC->BNB->USDC,USDT->XRP->BTC,BTC->LTC->USDC,USDT->BNB->BTC,USDC->XRP->USDT,USDT->BTC->USDC,USDT->MATIC->BTC,USDC->BTC->USDT,BTC->ETH->USDC,USDT->KLV->TRX,USDT->LTC->BTC,BTC->DOGE->USDT,USDT->ETH->BTC,BTC->BDX->USDT,USDT->DASH->BTC" -v $(pwd)/share:/app/share katakun/arbitr
 ```
+![Screenshot](src/img/arbitr-working.png)
 Get the container id from command
 ```commandline
 docker ps
