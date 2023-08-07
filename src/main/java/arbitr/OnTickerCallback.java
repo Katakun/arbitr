@@ -33,11 +33,10 @@ public class OnTickerCallback implements KucoinAPICallback<KucoinEvent<TickerCha
         synchronized (OnTickerCallback.class) {
             Optional<Swap[]> optionalSwaps = priceUpdater.updatePriceInSwaps(response, swaps);
             optionalSwaps.ifPresent(swaps -> {
-                Optional<BigDecimal> percentOptional = Calculator.calculate(swaps);
                 ZonedDateTime dateTime = ZonedDateTime.now().withZoneSameInstant(ZoneOffset.UTC);
                 Instant instant = dateTime.toInstant();
                 long milliseconds = instant.toEpochMilli();
-                percentOptional.ifPresent(percent -> {
+                Calculator.calculate(swaps).ifPresent(percent -> {
                     List<BigDecimal> ratios = Arrays.stream(swaps).map(Swap::getPrice).collect(Collectors.toList());
                     save(printer, ratios, percent, dateTime, milliseconds);
                 });
